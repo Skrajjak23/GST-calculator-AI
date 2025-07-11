@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart GST Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --gradient-start: #4361ee;
+            --gradient-end: #3a0ca3;
+            --gst-color: #10b981;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo i {
+            background: var(--gst-color);
+            color: white;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            color: var(--secondary);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f4f8;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #edf2f7;
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: #edf2f7;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: var(--gst-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--gst-color);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+        }
+
+        .gst-type {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .gst-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .gst-option.active {
+            border-color: var(--gst-color);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--gst-color);
+        }
+
+        .image-upload-container {
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .image-upload-container:hover {
+            border-color: var(--gst-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .image-upload-container i {
+            font-size: 3.5rem;
+            color: var(--gst-color);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .image-upload-container:hover i {
+            transform: translateY(-5px);
+        }
+
+        .image-upload-container p {
+            margin-bottom: 12px;
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        .image-upload-container .btn {
+            background: var(--gst-color);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 1.05rem;
+        }
+
+        .image-upload-container .btn:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 220px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--gst-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0da271;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-3px);
+        }
+
+        #response {
+            min-height: 200px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .response-content {
+            line-height: 1.8;
+        }
+
+        .gst-results {
+            background: #e6fcf5;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--gst-color);
+        }
+
+        .gst-result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #cbd5e0;
+        }
+
+        .gst-result-item:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading i {
+            font-size: 2.5rem;
+            color: var(--gst-color);
+            margin-bottom: 15px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ad-container {
+            text-align: center;
+            margin: 25px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .ad-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 30px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #c62828;
+        }
+
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .gst-type {
+                flex-direction: column;
+            }
+            
+            .image-upload-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-calculator"></i>
+                <h1>Smart GST Calculator</h1>
+            </div>
+            <p class="subtitle">Calculate GST manually or upload a receipt for automatic calculation</p>
+            
+            <div class="ad-container">
+                <div class="ad-label">Advertisement</div>
+                <div id="ad-banner">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : 'db0d69271e8c1f8e258ae0186d259a69',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.profitableratecpm.com/w1d0uwicyw?key=db0d69271e8c1f8e258ae0186d259a69"></script>
+                </div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-percentage"></i> GST Calculation</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="manual">Manual Calculation</div>
+                    <div class="tab" data-tab="image">Scan Receipt</div>
+                </div>
+                
+                <div class="input-group" id="manualTab">
+                    <div class="form-group">
+                        <label for="amount"><i class="fas fa-rupee-sign"></i> Amount</label>
+                        <input type="number" id="amount" placeholder="Enter amount" value="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gstRate"><i class="fas fa-chart-line"></i> GST Rate (%)</label>
+                        <input type="number" id="gstRate" placeholder="Enter GST rate" value="18">
+                    </div>
+                    
+                    <div>
+                        <label>GST Type</label>
+                        <div class="gst-type">
+                            <div class="gst-option active" data-type="exclusive">Exclusive</div>
+                            <div class="gst-option" data-type="inclusive">Inclusive</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group" id="imageTab" style="display: none;">
+                    <div class="image-upload-container" id="dropArea">
+                        <i class="fas fa-receipt"></i>
+                        <p>Upload a receipt or invoice</p>
+                        <p>OR</p>
+                        <div class="btn">Select Image</div>
+                        <input type="file" id="imageUpload" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                        <img id="imagePreview" alt="Preview">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gstRateImage"><i class="fas fa-chart-line"></i> GST Rate (%)</label>
+                        <input type="number" id="gstRateImage" placeholder="Enter GST rate (if not detected)" value="18">
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-primary" id="calculateBtn">
+                        <i class="fas fa-calculator"></i> Calculate GST
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-file-invoice-dollar"></i> GST Results</h2>
+                
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Analyzing receipt. Please wait...</p>
+                </div>
+                
+                <div id="response">
+                    <div class="response-content" id="responseContent">
+                        <div class="gst-results">
+                            <div class="gst-result-item">
+                                <span>Original Amount:</span>
+                                <span>₹0.00</span>
+                            </div>
+                            <div class="gst-result-item">
+                                <span>GST Rate:</span>
+                                <span>0%</span>
+                            </div>
+                            <div class="gst-result-item">
+                                <span>CGST (Central GST):</span>
+                                <span>₹0.00</span>
+                            </div>
+                            <div class="gst-result-item">
+                                <span>SGST (State GST):</span>
+                                <span>₹0.00</span>
+                            </div>
+                            <div class="gst-result-item">
+                                <span>Total GST:</span>
+                                <span>₹0.00</span>
+                            </div>
+                            <div class="gst-result-item">
+                                <span>Total Amount:</span>
+                                <span>₹0.00</span>
+                            </div>
+                        </div>
+                        <p class="info">Enter values and click "Calculate GST" to see results</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ad-container">
+                <div class="ad-label">Advertisement</div>
+                <div id="ad-banner-bottom">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : 'db0d69271e8c1f8e258ae0186d259a69',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.profitableratecpm.com/w1d0uwicyw?key=db0d69271e8c1f8e258ae0186d259a69"></script>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>© 2023 Smart GST Calculator | Powered by Google Gemini AI</p>
+            <p>Disclaimer: This tool provides calculations for informational purposes only.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // API Configuration
+            const API_KEY = "AIzaSyBTw0VtRGbNsvjRfTO1yuxV8VthX9qJ7Wg";
+            const MODEL_NAME = "gemini-1.5-pro-latest";
+            
+            // DOM Elements
+            const manualTab = document.querySelector('[data-tab="manual"]');
+            const imageTab = document.querySelector('[data-tab="image"]');
+            const manualTabContent = document.getElementById('manualTab');
+            const imageTabContent = document.getElementById('imageTab');
+            const amountInput = document.getElementById('amount');
+            const gstRateInput = document.getElementById('gstRate');
+            const gstRateImageInput = document.getElementById('gstRateImage');
+            const gstOptions = document.querySelectorAll('.gst-option');
+            const imageUpload = document.getElementById('imageUpload');
+            const imagePreview = document.getElementById('imagePreview');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const responseContent = document.getElementById('responseContent');
+            const loading = document.getElementById('loading');
+            const dropArea = document.getElementById('dropArea');
+            
+            let gstType = 'exclusive';
+            
+            // Set up tab switching
+            manualTab.addEventListener('click', () => {
+                manualTab.classList.add('active');
+                imageTab.classList.remove('active');
+                manualTabContent.style.display = 'flex';
+                imageTabContent.style.display = 'none';
+            });
+            
+            imageTab.addEventListener('click', () => {
+                imageTab.classList.add('active');
+                manualTab.classList.remove('active');
+                manualTabContent.style.display = 'none';
+                imageTabContent.style.display = 'flex';
+            });
+            
+            // Set up GST type selection
+            gstOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    gstOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    gstType = option.dataset.type;
+                });
+            });
+            
+            // Handle image preview
+            imageUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Check file size (max 4MB)
+                    if (file.size > 4 * 1024 * 1024) {
+                        alert("Image is too large. Please select an image smaller than 4MB.");
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                        dropArea.querySelector('p').textContent = "Image selected!";
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.style.borderColor = '#10b981';
+                dropArea.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            }
+            
+            function unhighlight() {
+                dropArea.style.borderColor = '#cbd5e0';
+                dropArea.style.backgroundColor = '';
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                imageUpload.files = files;
+                
+                // Trigger change event to show preview
+                const event = new Event('change');
+                imageUpload.dispatchEvent(event);
+            }
+            
+            // Reset button functionality
+            resetBtn.addEventListener('click', () => {
+                amountInput.value = '';
+                gstRateInput.value = '';
+                gstRateImageInput.value = '18';
+                imageUpload.value = '';
+                imagePreview.style.display = 'none';
+                dropArea.querySelector('p').textContent = "Upload a receipt or invoice";
+                
+                responseContent.innerHTML = `
+                    <div class="gst-results">
+                        <div class="gst-result-item">
+                            <span>Original Amount:</span>
+                            <span>₹0.00</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>GST Rate:</span>
+                            <span>0%</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>CGST (Central GST):</span>
+                            <span>₹0.00</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>SGST (State GST):</span>
+                            <span>₹0.00</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>Total GST:</span>
+                            <span>₹0.00</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>Total Amount:</span>
+                            <span>₹0.00</span>
+                        </div>
+                    </div>
+                    <p class="info">Enter values and click "Calculate GST" to see results</p>
+                `;
+            });
+            
+            // Calculate button functionality
+            calculateBtn.addEventListener('click', async () => {
+                const isManualTabActive = manualTab.classList.contains('active');
+                
+                if (isManualTabActive) {
+                    const amount = parseFloat(amountInput.value);
+                    const gstRate = parseFloat(gstRateInput.value);
+                    
+                    if (!amount || !gstRate) {
+                        alert('Please enter both amount and GST rate');
+                        return;
+                    }
+                    
+                    calculateGST(amount, gstRate, gstType);
+                } else {
+                    if (!imageUpload.files.length) {
+                        alert('Please upload an image of a receipt');
+                        return;
+                    }
+                    
+                    await analyzeReceipt(imageUpload.files[0]);
+                }
+            });
+            
+            // Calculate GST manually
+            function calculateGST(amount, gstRate, type) {
+                let originalAmount, cgst, sgst, totalGST, totalAmount;
+                
+                if (type === 'exclusive') {
+                    originalAmount = amount;
+                    totalGST = (amount * gstRate) / 100;
+                    cgst = totalGST / 2;
+                    sgst = totalGST / 2;
+                    totalAmount = originalAmount + totalGST;
+                } else {
+                    totalAmount = amount;
+                    originalAmount = (amount * 100) / (100 + gstRate);
+                    totalGST = totalAmount - originalAmount;
+                    cgst = totalGST / 2;
+                    sgst = totalGST / 2;
+                }
+                
+                displayResults(originalAmount, gstRate, cgst, sgst, totalGST, totalAmount);
+            }
+            
+            // Analyze receipt using Gemini AI
+            async function analyzeReceipt(imageFile) {
+                showLoading(true);
+                
+                try {
+                    // Convert image to base64
+                    const imageData = await fileToBase64(imageFile);
+                    
+                    // Construct the prompt
+                    const prompt = `You are an expert at analyzing receipts. Extract the total amount and GST rate from this receipt. If GST rate is not available, return 0. Return only in this JSON format: {"totalAmount": number, "gstRate": number}`;
+                    
+                    // Call the Gemini API with image
+                    const response = await callGeminiVisionAPI(prompt, imageData);
+                    
+                    // Try to parse the JSON response
+                    let jsonResponse;
+                    try {
+                        // Extract JSON from the response
+                        const jsonStart = response.indexOf('{');
+                        const jsonEnd = response.lastIndexOf('}') + 1;
+                        const jsonString = response.substring(jsonStart, jsonEnd);
+                        jsonResponse = JSON.parse(jsonString);
+                    } catch (e) {
+                        throw new Error('Could not parse response from AI');
+                    }
+                    
+                    const totalAmount = jsonResponse.totalAmount || 0;
+                    let gstRate = jsonResponse.gstRate || 0;
+                    
+                    // If GST rate not detected, use user input
+                    if (!gstRate || gstRate === 0) {
+                        gstRate = parseFloat(gstRateImageInput.value) || 0;
+                    }
+                    
+                    if (totalAmount > 0) {
+                        calculateGST(totalAmount, gstRate, 'inclusive');
+                    } else {
+                        throw new Error('Could not extract total amount from receipt');
+                    }
+                } catch (error) {
+                    console.error('Error analyzing receipt:', error);
+                    responseContent.innerHTML = `<div class="error"><i class="fas fa-exclamation-triangle"></i> ${error.message || 'Failed to analyze receipt. Please try again.'}</div>`;
+                } finally {
+                    showLoading(false);
+                }
+            }
+            
+            // Display results
+            function displayResults(originalAmount, gstRate, cgst, sgst, totalGST, totalAmount) {
+                responseContent.innerHTML = `
+                    <div class="gst-results">
+                        <div class="gst-result-item">
+                            <span>Original Amount:</span>
+                            <span>₹${originalAmount.toFixed(2)}</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>GST Rate:</span>
+                            <span>${gstRate}%</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>CGST (Central GST):</span>
+                            <span>₹${cgst.toFixed(2)}</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>SGST (State GST):</span>
+                            <span>₹${sgst.toFixed(2)}</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>Total GST:</span>
+                            <span>₹${totalGST.toFixed(2)}</span>
+                        </div>
+                        <div class="gst-result-item">
+                            <span>Total Amount:</span>
+                            <span>₹${totalAmount.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Convert file to base64
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                });
+            }
+            
+            // Show/hide loading indicator
+            function showLoading(show) {
+                loading.style.display = show ? 'block' : 'none';
+                calculateBtn.disabled = show;
+            }
+            
+            // Call Gemini API for vision (image)
+            async function callGeminiVisionAPI(prompt, imageData) {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+                
+                // Extract the base64 string without the data URL prefix
+                const base64Image = imageData.split(',')[1];
+                
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [
+                            { text: prompt },
+                            {
+                                inline_data: {
+                                    mime_type: "image/jpeg",
+                                    data: base64Image
+                                }
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.3,
+                        topK: 32,
+                        topP: 0.95,
+                        maxOutputTokens: 2048
+                    }
+                };
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || 'API request failed');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                        throw new Error('Invalid response from API');
+                    }
+                    
+                    return data.candidates[0].content.parts[0].text;
+                } catch (error) {
+                    // Handle network errors specifically
+                    if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+                        throw new Error('Network error. Please check your internet connection.');
+                    }
+                    throw error;
+                }
+            }
+            
+            // Initial calculation
+            calculateGST(1000, 18, 'exclusive');
+        });
+    </script>
+</body>
+</html>
